@@ -106,14 +106,18 @@ class Doctor:
             self.results.append(Result("POST /chat/completions", True,
                                        f"HTTP {status}; {detail} Output: {preview!r}", latency))
         except Exception as exc:
-            self.results.append(Result("POST /chat/completions", False, str(exc)))
+            label = "POST /chat/completions (stream)" if stream else "POST /chat/completions"
+            self.results.append(Result(label, False, str(exc)))
 
     def run(self, stream: bool = False) -> bool:
         print(f"LLM Proxy Doctor v{VERSION}\nEndpoint : {self.base_url}\nModel    : {self.model}\nTimeout  : {self.timeout:g}s")
         print("-" * 60)
         if self.verify_models:
             self.check_models()
-        self.check_chat(stream)
+        # Always validate the standard JSON response; --stream adds a second SSE check.
+        self.check_chat(False)
+        if stream:
+            self.check_chat(True)
         for item in self.results:
             state = "PASS" if item.ok else "FAIL"
             timing = f" ({item.latency_ms:.1f} ms)" if item.latency_ms is not None else ""
