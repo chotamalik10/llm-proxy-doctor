@@ -18,6 +18,10 @@ Check connectivity, authentication, model discovery, response structure, latency
 
 An LLM proxy can be reachable while still rejecting credentials, hiding model discovery, returning malformed JSON, or failing on streaming requests. LLM Proxy Doctor runs practical checks against an OpenAI-compatible API and reports what passed or failed.
 
+## How it works
+
+![LLM Proxy Doctor architecture](docs/images/architecture.svg)
+
 ## Features
 
 - Connectivity and per-request latency measurement.
@@ -50,26 +54,30 @@ These are illustrative previews of the CLI output. Real response times, model co
 
 ## Quick start
 
+Clone the repository:
+
 ~~~bash
 git clone https://github.com/chotamalik10/llm-proxy-doctor.git
 cd llm-proxy-doctor
 ~~~
 
-**Windows PowerShell**
+### Windows PowerShell
+
+![PowerShell quick-start guide](docs/images/setup-guide.svg)
 
 ~~~powershell
 $env:OPENAI_API_KEY = "your-api-key"
 python doctor.py --url "http://localhost:8000/v1" --model "your-model"
 ~~~
 
-**macOS / Linux**
+### macOS / Linux
 
 ~~~bash
 export OPENAI_API_KEY="your-api-key"
 python3 doctor.py --url "http://localhost:8000/v1" --model "your-model"
 ~~~
 
-If your proxy does not require authentication, leave the environment variable unset.
+If your proxy does not require authentication, leave the environment variable unset. Never commit real API keys.
 
 ## Usage
 
