@@ -1,32 +1,121 @@
 <div align="center">
 
-# 🩺 LLM Proxy Doctor & Live Telemetry Dashboard
+# 🩺 LLM Proxy Doctor
 
-**Enterprise-Grade CLI Diagnostics, Real-Time Failover Dashboard & Schema Validator for AI Gateways**
+**A lightweight, dependency-free diagnostic CLI for OpenAI-compatible LLM gateways.**
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![Dashboard: Live UI](https://img.shields.io/badge/Dashboard-Web%20%26%20TUI-blueviolet.svg)]()
-[![OpenAI Compatible](https://img.shields.io/badge/OpenAI-v1%20Compatible-orange.svg)](https://platform.openai.com/)
-[![CI Status](https://img.shields.io/badge/build-passing-brightgreen.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
+Check connectivity, authentication, model discovery, response structure, latency, and optional SSE streaming — from one command.
+
+[![Python](https://img.shields.io/badge/Python-3.9%2B-3776AB?logo=python&logoColor=white)](https://www.python.org/)
+[![CI](https://github.com/chotamalik10/llm-proxy-doctor/actions/workflows/ci.yml/badge.svg)](https://github.com/chotamalik10/llm-proxy-doctor/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 </div>
 
 ---
 
-## 🖥️ Live Telemetry Dashboard (TUI & Web Preview)
+## Why this project?
 
-```text
-┌──────────────────────────────────────────────────────────────────────────────┐
-│ 🩺 LLM PROXY DOCTOR v1.4.0 - LIVE GATEWAY TELEMETRY          [STATUS: ONLINE]│
-├──────────────────────┬────────────┬───────────┬──────────────┬───────────────┤
-│ GATEWAY ROUTE        │ STATUS     │ LATENCY   │ STREAM SPEED │ SCHEMA CHECK  │
-├──────────────────────┼────────────┼───────────┼──────────────┼───────────────┤
-│ Primary-OpenAI-v1    │ 🟢 200 OK  │ 142 ms    │ 84.2 tok/s   │ ✅ Verified   │
-│ Claude-Code-Router   │ 🟢 200 OK  │ 198 ms    │ 68.5 tok/s   │ ✅ Verified   │
-│ Local-Ollama-Qwen2.5 │ 🟢 200 OK  │  34 ms    │ 42.1 tok/s   │ ✅ Verified   │
-│ Fallback-Groq-Proxy  │ 🟡 429 LIM │ 610 ms    │  0.0 tok/s   │ ⚠️ Rate Limit │
-├──────────────────────┴────────────┴───────────┴──────────────┴───────────────┤
-│ 📊 Active Routes: 4/4  |  🛡️ Auth Leak Audit: PASSED  |  ⏱️ Auto-Refresh: 5s │
-└──────────────────────────────────────────────────────────────────────────────┘
+An LLM proxy can be reachable while still rejecting credentials, hiding model discovery, returning malformed JSON, or failing on streaming requests. LLM Proxy Doctor runs practical checks against an OpenAI-compatible API and reports what passed or failed.
 
+## Features
+
+- Connectivity and per-request latency measurement.
+- API key support through environment variables.
+- GET /models response validation.
+- POST /chat/completions request and response validation.
+- Optional Server-Sent Events (SSE) streaming check.
+- Actionable HTTP, connection, and timeout errors.
+- No third-party Python dependencies.
+- No API key passed as a command-line argument.
+
+## Requirements
+
+- Python 3.9 or newer.
+- An OpenAI-compatible API endpoint.
+- An API key only if your provider requires authentication.
+
+## Quick start
+
+~~~bash
+git clone https://github.com/chotamalik10/llm-proxy-doctor.git
+cd llm-proxy-doctor
+~~~
+
+**Windows PowerShell**
+
+~~~powershell
+$env:OPENAI_API_KEY = "your-api-key"
+python doctor.py --url "http://localhost:8000/v1" --model "your-model"
+~~~
+
+**macOS / Linux**
+
+~~~bash
+export OPENAI_API_KEY="your-api-key"
+python3 doctor.py --url "http://localhost:8000/v1" --model "your-model"
+~~~
+
+If your proxy does not require authentication, leave the environment variable unset.
+
+## Usage
+
+~~~bash
+python doctor.py --help
+~~~
+
+| Option | Default | Description |
+|---|---|---|
+| --url | http://localhost:8000/v1 | API base URL |
+| --model | gpt-4o-mini | Model identifier to test |
+| --timeout | 15 | Timeout per request, in seconds |
+| --stream | Off | Verify SSE streaming |
+| --skip-models | Off | Skip GET /models discovery |
+
+Examples:
+
+~~~bash
+python doctor.py --url "http://127.0.0.1:31415/v1" --model "auto"
+python doctor.py --url "https://api.example.com/v1" --model "my-model" --skip-models
+python doctor.py --url "http://localhost:8000/v1" --model "my-model" --stream
+~~~
+
+## What is checked?
+
+1. **GET /models** — expects a JSON object with a data array. Some providers disable this endpoint; use --skip-models when expected.
+2. **POST /chat/completions** — expects the standard choices[0].message.content response structure.
+3. **Streaming (optional)** — checks for SSE data events and the terminal [DONE] marker.
+
+A target model missing from /models is reported as a note, not an automatic failure, because some gateways accept aliases that are not listed.
+
+## Exit codes
+
+- 0 — all enabled checks passed.
+- 1 — one or more checks failed.
+- 2 — invalid command-line arguments.
+
+## Run tests
+
+~~~bash
+python -m unittest discover -s tests -v
+~~~
+
+## Security
+
+- Keep API keys in environment variables; never commit secrets.
+- Use HTTPS for remote endpoints.
+- The tool does not store credentials or telemetry.
+- A small test prompt is sent to the endpoint you configure.
+- Avoid sharing diagnostic output if error bodies contain sensitive data.
+
+## Scope and limitations
+
+This is a diagnostic CLI, not a hosted dashboard, automatic failover controller, or proxy server. It does not modify provider configuration or route production traffic. Checks target the OpenAI-compatible API shape and may need adaptation for provider-specific extensions.
+
+## Contributing
+
+Bug reports and focused pull requests are welcome. Include your Python version, command used with secrets removed, and sanitized error output.
+
+## License
+
+MIT. See LICENSE.
