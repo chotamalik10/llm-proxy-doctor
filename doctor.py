@@ -19,7 +19,7 @@ class Result:
 def normalize_base_url(url: str) -> str:
     value = url.strip().rstrip("/")
     parsed = urlsplit(value)
-    if parsed.scheme not in ("http", "https) or not parsed.netloc:
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
         raise ValueError("URL must start with http:// or https:// and include a host.")
     if parsed.username or parsed.password:
         raise ValueError("Do not put credentials in the URL. Use OPENAI_API_KEY instead.")
