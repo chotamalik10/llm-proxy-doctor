@@ -29,6 +29,19 @@ An LLM proxy can be reachable while still rejecting credentials, hiding model di
 - No third-party Python dependencies.
 - No API key passed as a command-line argument.
 
+## Terminal previews
+
+These are illustrative previews of the CLI output. Real response times, model counts, and error messages depend on your configured provider.
+
+### Command help
+![LLM Proxy Doctor command help](docs/images/terminal-help.svg)
+
+### Successful diagnostic
+![LLM Proxy Doctor successful terminal check](docs/images/terminal-success.svg)
+
+### Connection error example
+![LLM Proxy Doctor connection error output](docs/images/terminal-failure.svg)
+
 ## Requirements
 
 - Python 3.9 or newer.
