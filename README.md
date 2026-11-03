@@ -121,6 +121,8 @@ python -m unittest discover -s tests -v
 - A small test prompt is sent to the endpoint you configure.
 - Avoid sharing diagnostic output if error bodies contain sensitive data.
 
+See [Troubleshooting](docs/TROUBLESHOOTING.md), [Contributing](CONTRIBUTING.md), [Security Policy](SECURITY.md), and [MIT License](LICENSE).
+
 ## Scope and limitations
 
 This is a diagnostic CLI, not a hosted dashboard, automatic failover controller, or proxy server. It does not modify provider configuration or route production traffic. Checks target the OpenAI-compatible API shape and may need adaptation for provider-specific extensions.
